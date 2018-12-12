@@ -2,9 +2,9 @@
 "A program to generate a set of random points and use the for clustering."
 
 import sys
-from random import randint, choice
+from random import choice, randint
 from point_class import point
-from distributions import *
+from matplotlib import pyplot as plt
 
 def all_true(bool_list):
     answer = True
@@ -31,65 +31,76 @@ def get_mean(point_list):
         total_y += pnt.y()
     return point(total_x/len(point_list), total_y/len(point_list))
 
-def list_string(point_list):
-    _s = "["
-    for pnt in point_list:
-        _s = _s + str(pnt)+", "
-    _s = _s.rstrip(", ")
-    _s = _s + "]"
-    return _s
-
 def write_list_string(point_list):
     _s = ""
     for pnt in point_list:
         _s = _s+str(pnt.x())+" "+str(pnt.y())+"\n"
     return _s
 
-def main():
-    "Main function for running everything."
-    total_points = int(sys.argv[1])
-    threshold_distance = pow(10, -int(sys.argv[2]))
-    total_clusters = int(sys.argv[3])
-    # points = uniform(total_points).get_list()
-    # points = two_square_partitioned(total_points).get_list()
-    points = point_clustering(total_points).get_list()
-    _f = open("../Data/data_"+str(total_points)+"_"+str(total_clusters)+".txt", "w+")
-    _f.write("Total Points: "+str(total_points)+"\nTotal Clusters: "+str(total_clusters)+"\n\n")
-    _f.write("Total Points\n"+write_list_string(points)+"\n\n")
-    clusters = [[] for _ in range(total_clusters)]
+def get_points_from_file(file):
+    file.readline()
+    file.readline()
+    points = []
+    for line in file:
+        if line == '\n':
+            break
+        points.append(point(int(line.split()[0]), int(line.split()[-1])))
+    return points
+
+def get_points(case):
+    if case == 0:
+        _f = open("../Distributions/uniform_"+sys.argv[3]+".txt")
+    elif case == 1:
+        _f = open("../Distributions/partitioned_"+sys.argv[3]+".txt")
+    elif case == 2:
+        _f = open("../Distributions/point_centered_"+sys.argv[3]+"_"+sys.argv[4]+"_"+sys.argv[5]+".txt")
+    else:
+        print("Illegal Case")
+        sys.exit(0)
+    return get_points_from_file(_f)
+
+def random_pivots(points):
     cluster_pivots = []
+    while len(cluster_pivots) != int(sys.argv[1]):
+        temp_point = choice(points)
+        if cluster_pivots.count(temp_point) == 0:
+            cluster_pivots.append(temp_point)
+    return cluster_pivots
+
+def main():
+    case = int(sys.argv[2])
+
+    total_clusters = int(sys.argv[1])
+
+    points = get_points(case)
+
+    clusters = [[] for _ in range(total_clusters)]
+    cluster_pivots = random_pivots(points)
     cluster_complete = [False]*total_clusters
-    for _ in range(total_clusters):
-        while True:
-            temp_point = choice(points)
-            if cluster_pivots.count(temp_point) == 0:
-                cluster_pivots.append(temp_point)
-                break
-    passes = 0
-    while not all_true(cluster_complete):
-        passes += 1
-        _f.write("Pass no. "+str(passes)+"\n\n")
+
+    while True:
         for pnt in points:
             clusters[closest(pnt, cluster_pivots)].append(pnt)
-        for i in range(len(clusters)):
-            _f.write("Cluster No. "+str(i+1)+"\n")
-            _f.write("Pivot: "+str(cluster_pivots[i].x())+" "+str(cluster_pivots[i].y())+"\n")
-            _f.write("Mean: "+str(get_mean(clusters[i]))+"\n")
-            _f.write(write_list_string(clusters[i])+"\n")
         for i in range(total_clusters):
             if not cluster_complete[i]:
                 mean_point = get_mean(clusters[i])
-                if mean_point.distance(cluster_pivots[i]) <= threshold_distance:
+                if mean_point.distance(cluster_pivots[i]) <= pow(10, -2):
                     cluster_complete[i] = True
                 cluster_pivots[i] = mean_point
         if all_true(cluster_complete):
-            _f.write("Total passes: "+str(passes)+"\nFinal Clustering\n\n")
-            for i in range(len(clusters)):
-                _f.write("Cluster No. "+str(i+1)+"\n")
-                _f.write("Pivot: "+str(cluster_pivots[i].x())+" "+str(cluster_pivots[i].y())+"\n")
-                _f.write("Mean: "+str(get_mean(clusters[i]))+"\n")
-                _f.write(write_list_string(clusters[i])+"\n")
+            break
         clusters = [[] for _ in range(total_clusters)]
+
+    for cluster in clusters:
+        r = lambda: randint(0,255)
+        clr = ('#%02X%02X%02X' % (r(),r(),r()))
+        x = []
+        y = []
+        for pnt in cluster:
+            x.append(pnt.x())
+            y.append(pnt.y())
+        plt.plot(x, y, 'o', markersize = 2, color = clr)
+    plt.show()
 
 if __name__ == '__main__':
     main()
