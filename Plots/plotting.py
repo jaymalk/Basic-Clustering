@@ -11,7 +11,7 @@ def main():
     colors = []
     for _ in range(total_clusters):
         colors.append('#%02X%02X%02X' % (r(),r(),r()))
-    _f = open("./data_"+str(total_points)+"_"+str(total_clusters)+".txt", "r+")
+    _f = open("../Data/data_"+str(total_points)+"_"+str(total_clusters)+".txt", "r+")
     while True:
         line = _f.readline()
         if line.startswith("Final"):

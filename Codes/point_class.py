@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 "A class of points on 2D"
 from math import sqrt
+from matplotlib import pyplot as plt
 
 class point:
 
@@ -10,6 +11,9 @@ class point:
 
     def __str__(self):
         return "("+str(self._x)+","+str(self._y)+")"
+
+    def plot(self, clr):
+        plt.plot(self._x, self._y, 'o', markersize=1.5, color=clr)
 
     def x(self):
         return self._x

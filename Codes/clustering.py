@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 "A program to generate a set of random points and use the for clustering."
 
-import sys                              # Taking arguments from command line
-from random import randint, choice      # Randomly selecting points
-from point_class import point           # Points class self-created for workign with the points
-from distributions import uniform
+import sys
+from random import randint, choice
+from point_class import point
+from distributions import *
 
 def all_true(bool_list):
     answer = True
@@ -50,8 +50,10 @@ def main():
     total_points = int(sys.argv[1])
     threshold_distance = pow(10, -int(sys.argv[2]))
     total_clusters = int(sys.argv[3])
-    points = uniform(total_points).get_list()
-    _f = open("./data_"+str(total_points)+"_"+str(total_clusters)+".txt", "w+")
+    # points = uniform(total_points).get_list()
+    # points = two_square_partitioned(total_points).get_list()
+    points = point_clustering(total_points).get_list()
+    _f = open("../Data/data_"+str(total_points)+"_"+str(total_clusters)+".txt", "w+")
     _f.write("Total Points: "+str(total_points)+"\nTotal Clusters: "+str(total_clusters)+"\n\n")
     _f.write("Total Points\n"+write_list_string(points)+"\n\n")
     clusters = [[] for _ in range(total_clusters)]
