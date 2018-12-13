@@ -37,22 +37,43 @@ class uniform(distributions):
             self.list.append(point(random.randint(-1000, 1000), random.randint(-1000, 1000)))
 
 
-class two_square_partitioned(distributions):
+class point_square(distributions):
+
+    def __init__(self, size, points=10, max_sq_size=100):
+        self.points = points
+        self.max_sq_size = max_sq_size
+        distributions.__init__(self, size)
 
     def _fill_list(self):
-        p_1 = random.choice([501, -501])
-        p_2 = random.choice([501, -501])
-        p_3 = random.choice([501, -501])
-        p_4 = random.choice([501, -501])
-        for _ in range(self.size//2):
-            self.list.append(point(p_1+random.randint(-500, 500), p_2+random.randint(-500, 500)))
-            self.list.append(point(p_3+random.randint(-500, 500), p_4+random.randint(-500, 500)))
-        if self.size%2 == 1:
-            self.list.append(point(0, 0))
+        self.list.append(point(random.randint(-1000, 1000), random.randint(-1000, 1000)))
+        set_points = 1
+        while set_points != self.points:
+            temp_point = point(random.randint(-1000, 1000), random.randint(-1000, 1000))
+            if self._is_set_valid(temp_point):
+                set_points += 1
+                self.list.append(temp_point)
+        total = self.points+1
+        while total != self.size:
+            temp_point = point(random.randint(-1000, 1000), random.randint(-1000, 1000))
+            if self._is_valid(temp_point):
+                self.list.append(temp_point)
+                total += 1
 
-class point_centered(distributions):
+    def _is_valid(self, pnt):
+        for i in range(self.points):
+            if abs(pnt.x()-self.list[i].x()) < self.max_sq_size//2 and abs(pnt.y()-self.list[i].y()) < self.max_sq_size//2:
+                return True
+        return False
 
-    def __init__(self, size, points=None, min_dist=None):
+    def _is_set_valid(self, pnt):
+        for i in range(len(self.list)):
+            if pnt.distance(self.list[i]) < self.max_sq_size:
+                return False
+        return True
+
+class point_circle(distributions):
+
+    def __init__(self, size, points=10, min_dist=100):
         self.points = points
         self.min_dist = min_dist
         distributions.__init__(self, size)
@@ -92,10 +113,10 @@ def main():
         uniform(int(sys.argv[2])).write_on_file("uniform_"+sys.argv[2]+".txt")
     elif case == 1:
         # Square Partitioning
-        two_square_partitioned(int(sys.argv[2])).write_on_file("partitioned_"+sys.argv[2]+".txt")
+        point_square((int(sys.argv[2])), int(sys.argv[3]), int(sys.argv[4])).write_on_file("point_square_"+sys.argv[2]+"_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
     elif case == 2:
         # Point Clustering
-        point_centered(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])).write_on_file("point_centered_"+sys.argv[2]+"_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
+        point_circle(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])).write_on_file("point_circle_"+sys.argv[2]+"_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
 
     else:
         print("Illegal case.")

@@ -51,9 +51,9 @@ def get_points(case):
     if case == 0:
         _f = open("../Distributions/uniform_"+sys.argv[3]+".txt")
     elif case == 1:
-        _f = open("../Distributions/partitioned_"+sys.argv[3]+".txt")
+        _f = open("../Distributions/point_square_"+sys.argv[3]+"_"+sys.argv[4]+"_"+sys.argv[5]+".txt")
     elif case == 2:
-        _f = open("../Distributions/point_centered_"+sys.argv[3]+"_"+sys.argv[4]+"_"+sys.argv[5]+".txt")
+        _f = open("../Distributions/point_circle_"+sys.argv[3]+"_"+sys.argv[4]+"_"+sys.argv[5]+".txt")
     else:
         print("Illegal Case")
         sys.exit(0)
@@ -84,7 +84,7 @@ def main():
         for i in range(total_clusters):
             if not cluster_complete[i]:
                 mean_point = get_mean(clusters[i])
-                if mean_point.distance(cluster_pivots[i]) <= pow(10, -2):
+                if mean_point.distance(cluster_pivots[i]) <= pow(10, -4):
                     cluster_complete[i] = True
                 cluster_pivots[i] = mean_point
         if all_true(cluster_complete):
