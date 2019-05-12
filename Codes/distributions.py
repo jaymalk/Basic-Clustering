@@ -128,6 +128,37 @@ class concentric_circles(distributions):
                 i += 1
         return point_list
 
+class random_lines(distributions):
+
+    def __init__(self, size, lines):
+        self.lines = lines
+        distributions.__init__(self, size)
+    
+    def _fill_list(self):
+        for _ in range(self.lines):
+            m = random.randint(-10, 10)
+            c = random.randint(-1000, 1000)
+            for _ in range(self.size):
+                x = random.randint(-1000, 1000)
+                y = (m*x+c)%2000 - 1000 + (random.randint(-5, 5))
+                self.list.append(point(x, y))
+
+class random_polynomial(distributions):
+
+    def __init__(self, size, power, count):
+        self.count = count
+        self.power = power
+        distributions.__init__(self, size)
+    
+    def _fill_list(self):
+        for _ in range(self.count):
+            m = random.randint(-10, 10)
+            c = random.randint(-1000, 1000)
+            for _ in range(self.size):
+                x = random.randint(-1000, 1000)
+                y = (m*pow(x, self.power)+c)%2000 - 1000 + (random.randint(-5, 5))
+                self.list.append(point(x, y))
+
 def main():
     case = int(sys.argv[1])
     if case == 0:
@@ -140,9 +171,15 @@ def main():
         # Point Clustering
         point_circle(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])).write_on_file("point_circle_"+sys.argv[2]+"_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
     elif case == 3:
-        # Point Clustering
+        # Concentric Circles
         concentric_circles(int(sys.argv[2]), int(sys.argv[3])).write_on_file("concentric_circles_"+sys.argv[2]+"_"+sys.argv[3]+".txt")
-
+    elif case == 4:
+        # Random Lines
+        random_lines(int(sys.argv[2]), int(sys.argv[3])).write_on_file("random_lines_"+sys.argv[2]+"_"+sys.argv[3]+".txt")
+    elif case == 5:
+        # Random Polynomials
+        random_polynomial(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])).write_on_file("random_polynomial_"+sys.argv[2]+"_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
+    
     else:
         print("Illegal case.")
 

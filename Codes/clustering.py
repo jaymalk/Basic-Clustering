@@ -56,6 +56,10 @@ def get_points(case):
         _f = open("../Distributions/point_circle_"+sys.argv[3]+"_"+sys.argv[4]+"_"+sys.argv[5]+".txt")
     elif case == 3:
         _f = open("../Distributions/concentric_circles_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
+    elif case == 4:
+        _f = open("../Distributions/random_lines_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
+    elif case == 5:
+        _f = open("../Distributions/random_polynomial_"+sys.argv[3]+"_"+sys.argv[4]+"_"+sys.argv[5]+".txt")
     else:
         print("Illegal Case")
         sys.exit(0)
