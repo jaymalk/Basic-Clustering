@@ -106,6 +106,28 @@ class point_circle(distributions):
                 return False
         return True
 
+class concentric_circles(distributions):
+
+    def __init__(self, size, points=10):
+        self.points = points
+        distributions.__init__(self, size)
+
+    def _fill_list(self):
+        for i in range(self.points):
+            self.list += self._fill_circle(900*(1+i)/self.points)
+
+    def _fill_circle(self, radius):
+        dist = 300/self.points
+        center = point(0, 0)
+        point_list = []
+        i = 0
+        while i < self.size*(radius/90):
+            temp_point = point(random.randint(-1000, 1000), random.randint(-1000, 1000))
+            if temp_point.distance(center) <= radius+dist and temp_point.distance(center) >= radius-dist:
+                point_list.append(temp_point)
+                i += 1
+        return point_list
+
 def main():
     case = int(sys.argv[1])
     if case == 0:
@@ -117,6 +139,9 @@ def main():
     elif case == 2:
         # Point Clustering
         point_circle(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])).write_on_file("point_circle_"+sys.argv[2]+"_"+sys.argv[3]+"_"+sys.argv[4]+".txt")
+    elif case == 3:
+        # Point Clustering
+        concentric_circles(int(sys.argv[2]), int(sys.argv[3])).write_on_file("concentric_circles_"+sys.argv[2]+"_"+sys.argv[3]+".txt")
 
     else:
         print("Illegal case.")
