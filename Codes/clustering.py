@@ -4,7 +4,18 @@
 import sys
 from random import choice, randint
 from point_class import point
+from math import sqrt
 from matplotlib import pyplot as plt
+
+try:
+    from tqdm import trange
+    __it = lambda x : trange(x)
+    print('Using: trange')
+except ImportError:
+    from itertools import repeat
+    __it = lambda x : repeat(None, x)
+    print('Using: repeat')
+
 
 def all_true(bool_list):
     answer = True
@@ -73,6 +84,15 @@ def random_pivots(points):
             cluster_pivots.append(temp_point)
     return cluster_pivots
 
+def Jovian(cls, pts):
+    _dist = 0
+    for i in range(len(cls)):
+        _cl = cls[i]
+        _pvt = pts[i]
+        for _pt in _cl:
+            _dist += (_pt.distance(_pvt)**2)
+    return sqrt(_dist)
+
 def main():
     case = int(sys.argv[2])
 
@@ -82,22 +102,31 @@ def main():
 
     clusters = [[] for _ in range(total_clusters)]
     cluster_pivots = random_pivots(points)
+    min_heuristic = -1
     cluster_complete = [False]*total_clusters
+    best_fit = []
 
-    while True:
-        for pnt in points:
-            clusters[closest(pnt, cluster_pivots)].append(pnt)
-        for i in range(total_clusters):
-            if not cluster_complete[i]:
-                mean_point = get_mean(clusters[i])
-                if mean_point.distance(cluster_pivots[i]) <= pow(10, -4):
-                    cluster_complete[i] = True
-                cluster_pivots[i] = mean_point
-        if all_true(cluster_complete):
-            break
+    for _ in __it(20*total_clusters):
+        while True:
+            for pnt in points:
+                clusters[closest(pnt, cluster_pivots)].append(pnt)
+            for i in range(total_clusters):
+                if not cluster_complete[i]:
+                    mean_point = get_mean(clusters[i])
+                    if mean_point.distance(cluster_pivots[i]) <= pow(10, -4):
+                        cluster_complete[i] = True
+                    cluster_pivots[i] = mean_point
+            if all_true(cluster_complete):
+                break
+            clusters = [[] for _ in range(total_clusters)]
+        _heuristic = Jovian(clusters, cluster_pivots)
+        if min_heuristic == -1 or _heuristic < min_heuristic:
+            min_heuristic = _heuristic
+            best_fit = clusters
         clusters = [[] for _ in range(total_clusters)]
+        cluster_pivots = random_pivots(points)
 
-    for cluster in clusters:
+    for cluster in best_fit:
         r = lambda: randint(0,255)
         clr = ('#%02X%02X%02X' % (r(),r(),r()))
         x = []
